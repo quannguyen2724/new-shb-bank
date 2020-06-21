@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using shb_bank.Entity;
 using shb_bank.Helper;
@@ -18,7 +20,7 @@ namespace shb_bank.Model
             {
                 //kiểm tra tài khoản
                 var strGetAccount =
-                    $"select balance from SHBAccount where accountNumber = {accountNumber} and status = {(int) AccountStatus.Active}";
+                    $"select balance from shbaccount where accountNumber = {accountNumber} and status = {(int) AccountStatus.Active}";
                 var cmdGetAccount = new MySqlCommand(strGetAccount, cnn);
                 var accountReader = cmdGetAccount.ExecuteReader();
                 if (!accountReader.Read())
@@ -238,6 +240,74 @@ namespace shb_bank.Model
                 cnn.Close();
             }
             return false;
+        }
+
+        public List<Transaction> GetTransactionHistory(string accountNumber)
+        {
+            var listTransaction = new List<Transaction>();
+            var cnn = ConnectionHelper.GetConnection();
+            cnn.Open();
+            var strGetListTransaction = $"select * from shbtransaction where senderAccountNumber = '{accountNumber}' or receiverAccountNumber = '{accountNumber}'";
+            var cmdGetListTransaction = new MySqlCommand(strGetListTransaction, cnn);
+            var reader = cmdGetListTransaction.ExecuteReader();
+            while (reader.Read())
+            {
+                listTransaction.Add(new Transaction()
+                {
+                    TransactionCode = reader.GetString("transactionCode"),
+                    SenderAccountNumber = reader.GetString("senderAccountNumber"),
+                    ReceiverAccountNumber = reader.GetString("receiverAccountNumber"),
+                    Type = (TransactionType) reader.GetInt32("type"),
+                    Amount = reader.GetDouble("amount"),
+                    Fee = reader.GetDouble("fee"),
+                    Message = reader.GetString("message"),
+                    CreatedAt = reader.GetDateTime("createdAt"),
+                    UpdatedAt = reader.GetDateTime("updateAt"),
+                    Status = (TransactionStatus) reader.GetInt32("status")
+                });
+            }
+            cnn.Close();
+            return listTransaction;
+        }
+
+        public List<Transaction> GetAllTransactionHistory()
+        {
+            var listTransaction = new List<Transaction>();
+            var cnn = ConnectionHelper.GetConnection();
+            cnn.Open();
+            try
+            {
+                var strGetListTransaction = "select * from shbtransaction";
+                var cmdGetListTransaction = new MySqlCommand(strGetListTransaction, cnn);
+                var reader = cmdGetListTransaction.ExecuteReader();
+                while (reader.Read())
+                {
+                    listTransaction.Add(new Transaction()
+                    {
+                        TransactionCode = reader.GetString("transactionCode"),
+                        SenderAccountNumber = reader.GetString("senderAccountNumber"),
+                        ReceiverAccountNumber = reader.GetString("receiverAccountNumber"),
+                        Type = (TransactionType) reader.GetInt32("type"),
+                        Amount = reader.GetDouble("amount"),
+                        Fee = reader.GetDouble("fee"),
+                        Message = reader.GetString("message"),
+                        CreatedAt = reader.GetDateTime("createdAt"),
+                        UpdatedAt = reader.GetDateTime("updateAt"),
+                        Status = (TransactionStatus) reader.GetInt32("status")
+                    });
+                }
+
+                return listTransaction;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+            finally
+            {
+                cnn.Close();
+            }
         }
     }
 }

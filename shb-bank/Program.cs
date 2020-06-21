@@ -11,7 +11,7 @@ namespace shb_bank
         {
             Console.OutputEncoding = Encoding.UTF8;
             var generateMenu = new GenerateMenu();
-            generateMenu.GetMenu();
+            generateMenu.GetMenu(AccountController.currentAccount);
         }
     }
 }

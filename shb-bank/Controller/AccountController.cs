@@ -40,45 +40,122 @@ namespace shb_bank.Controller
             }
             else
             {
-                Console.WriteLine("Đăn ký thất bại, số tài khoản, số điện thoại hoặc email đã có người sử dụng!!");
+                Console.WriteLine("Đăng ký thất bại, số tài khoản, số điện thoại hoặc email đã có người sử dụng!!");
             }
         }
-        
+
         public Account Login()
         {
-            GenerateMenu generateMenu = new GenerateMenu();
-            try 
+            var generateMenu = new GenerateMenu();
+            Console.WriteLine("Enter Your Username: ");
+            var username = Console.ReadLine();
+            if (username.Length <= 0)
             {
-                Console.WriteLine("Enter Your Username: ");
-                var username = Console.ReadLine();
-                Console.WriteLine("Enter Your Password: ");
-                var password = Console.ReadLine();
-                var account = _accountModel.GetAccountByUsername(username);
-                if (account !=null
-                    && _passwordHelper.ComparePassword(password, account.Salt, account.PasswordHash))
-                {
-                    Console.WriteLine("Đăng nhập thành công");
-                    currentAccount = account;
-                    generateMenu.GetMenu();
-                }
-                Console.WriteLine("Đăng nhập thất bại");
-                return null;
+                throw new Exception("Username không được để trống");
             }
-            catch (Exception e)
+
+            Console.WriteLine("Enter Your Password: ");
+            var password = Console.ReadLine();
+            if (password.Length <= 0)
             {
-                Console.WriteLine(e);
-                throw;
+                throw new Exception("Password không được để trống");
             }
+
+            var account = _accountModel.GetAccountByUsername(username);
+            if (account != null
+                && _passwordHelper.ComparePassword(password, account.Salt, account.PasswordHash))
+            {
+                Console.WriteLine("Đăng nhập thành công");
+                currentAccount = account;
+                generateMenu.GetMenu(currentAccount);
+                return currentAccount;
+            }
+
+            Console.WriteLine("Đăng nhập thất bại");
+            return null;
         }
-        
+
         public void ListUser()
         {
-            foreach (var account in _accountModel.GetList())
+            var listUser = _accountModel.GetList(null, null);
+            if (listUser.Count > 0)
             {
-                Console.WriteLine(account.ToString());
+                foreach (var account in listUser)
+                {
+                    Console.WriteLine(account.ToString());
+                }
+            }
+            else
+            {
+                Console.WriteLine("Không có tài khoản nào");
             }
         }
+
+        public void BalanceQty()
+        {
+            Console.WriteLine($"Số dư trong tài khoản của bạn là: {currentAccount.Balance}");
+        }
+
+        public void UpdateAccountInfor()
+        {
+            if (currentAccount.Role == AccountRole.User)
+            {
+                _accountModel.UpdatetAccount(currentAccount.AccountNumber, "updateInfor");
+            }
+            else
+            {
+                var userAccount = new Account();
+                Console.WriteLine("Nhập số tài khoản muốn thay đổi thông tin: ");
+                userAccount.AccountNumber = Console.ReadLine();
+                _accountModel.UpdatetAccount(userAccount.AccountNumber, "updateInfor");
+            }
+        }
+
+        public void UpdateAccountPassword()
+        {
+            if (currentAccount.Role == AccountRole.User)
+            {
+                _accountModel.UpdatetAccount(currentAccount.AccountNumber, "updatePassword");
+            }
+            else
+            {
+                var userAccount = new Account();
+                Console.WriteLine("Nhập số tài khoản muốn thay đổi mật khẩu: ");
+                userAccount.AccountNumber = Console.ReadLine();
+                _accountModel.UpdatetAccount(userAccount.AccountNumber, "updatePassword");
+            }
+        }
+
+        public void UpdateAccountStatus()
+        {
+            var userAccount = new Account();
+            Console.WriteLine("Nhập số tài khoản muốn thay đổi trạng thái: ");
+            userAccount.AccountNumber = Console.ReadLine();
+            _accountModel.UpdatetAccount(userAccount.AccountNumber, "activeAccount");
+        }
+
+        public void FindUserByUsername()
+        {
+            var acc = new Account();
+            Console.WriteLine("Nhập tên người dùng: ");
+            acc.Username = Console.ReadLine();
+            _accountModel.GetList("username", acc.Username);
+        }
         
+        public void FindUserByAccountNumber()
+        {
+            var acc = new Account();
+            Console.WriteLine("Nhập số tài khoản: ");
+            acc.AccountNumber = Console.ReadLine();
+            _accountModel.GetList("accountNumber", acc.AccountNumber);
+        }
         
+        public void FindUserByPhone()
+        {
+            var acc = new Account();
+            Console.WriteLine("Nhập số điện thoại: ");
+            acc.Phone = Console.ReadLine();
+            _accountModel.GetList("phone",  acc.Phone);
+        }
     }
 }

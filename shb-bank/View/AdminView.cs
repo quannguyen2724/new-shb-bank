@@ -1,5 +1,6 @@
 ﻿using System;
 using shb_bank.Controller;
+using shb_bank.Entity;
 
 namespace shb_bank.View
 {
@@ -8,7 +9,8 @@ namespace shb_bank.View
         public static void GenerateAdminMenu()
         {
             var generateMenu = new GenerateMenu();
-            AccountController accountController = new AccountController();
+            var accountController = new AccountController();
+            var transactionController = new TransactionController();
             while (true)
             {
                 try
@@ -38,58 +40,53 @@ namespace shb_bank.View
                             accountController.ListUser();
                             break;
                         case 2:
-                            Console.WriteLine("Danh sách lịch sử giao dịch");
+                            transactionController.PrintlistTransactionHistory();
                             break;
                         case 3:
-                            Console.WriteLine("Tìm kiếm người dùng theo tên");
+                            accountController.FindUserByUsername();
                             break;
                         case 4:
-                            Console.WriteLine("Tim kiem nguoi dung theo stk");
+                            accountController.FindUserByAccountNumber();
                             break;
                         case 5:
-                            Console.WriteLine("Tìm kiếm người dùng theo số điện thoại");
+                            accountController.FindUserByPhone();
                             break;
                         case 6:
-                            Console.WriteLine("Them nguoi dung moi");
+                            accountController.Register();
                             break;
                         case 7:
-                            Console.WriteLine("Khoa va mo tai khoan nguoi dung");
+                            accountController.UpdateAccountStatus();
                             break;
                         case 8:
-                            Console.WriteLine("Tim kiem lich su giao dich theo stk");
+                            transactionController.PrintListTransaction();
                             break;
                         case 9:
-                            Console.WriteLine("Thay doi thong tin tai khoan");
+                            accountController.UpdateAccountInfor();
                             break;
                         case 10:
-                            Console.WriteLine("Thay doi thong tin mat khau");
+                            accountController.UpdateAccountPassword();
                             break;
                         case 11:
-                            Console.WriteLine("Dang xuat");
-                           
+                            Console.WriteLine("Đăng xuất");
                             break;
                         case 12:
-                            Console.WriteLine("Thoat");
+                            Console.WriteLine("Goodbye!");
+                            Environment.Exit(0);
                             break;
                         default:
                             Console.WriteLine("Hãy nhập từ 1 đến 12");
                             break;
                     }
                     
-                    if (choice == 12)
-                    {
-                        break;
-                    }
-
                     if (choice == 11)
                     {
                         AccountController.currentAccount = null;
-                        generateMenu.GetMenu();
+                        generateMenu.GetMenu(AccountController.currentAccount);
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Bạn phải nhập vào 1 số");
+                    Console.WriteLine(e.Message);
                 }
                 Console.ReadLine();
             }

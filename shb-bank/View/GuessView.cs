@@ -30,23 +30,21 @@ namespace shb_bank.View
                             accountController.Login();
                             break;
                         case 3:
-                            Console.WriteLine("Thoat");
+                            Console.WriteLine("Goodbye!!!");
+                            Environment.Exit(0);
                             break;
                         default:
                             Console.WriteLine("Chọn 1, 2 hoặc 3");
                             break;
                     }
-
-                    Console.ReadLine();
-                    if (choice == 3)
-                    {
-                        break;
-                    }
+                    
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Bạn phai nhập vào số");
+                    Console.WriteLine(e.Message);
                 }
+                
+                Console.ReadLine();
             }
         }
     }

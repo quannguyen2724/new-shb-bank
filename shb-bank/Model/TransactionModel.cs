@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using shb_bank.Entity;
 using shb_bank.Helper;
@@ -18,7 +20,7 @@ namespace shb_bank.Model
             {
                 //kiểm tra tài khoản
                 var strGetAccount =
-                    $"select balance from SHBAccount where accountNumber = {accountNumber} and status = {(int) AccountStatus.Active}";
+                    $"select balance from shbaccount where accountNumber = {accountNumber} and status = {(int) AccountStatus.Active}";
                 var cmdGetAccount = new MySqlCommand(strGetAccount, cnn);
                 var accountReader = cmdGetAccount.ExecuteReader();
                 if (!accountReader.Read())
@@ -238,6 +240,135 @@ namespace shb_bank.Model
                 cnn.Close();
             }
             return false;
+        }
+
+        public List<Transaction> GetTransactionHistory(string accountNumber)
+        {
+            var listTransaction = new List<Transaction>();
+            var cnn = ConnectionHelper.GetConnection();
+            cnn.Open();
+            var strGetListTransaction = $"select * from shbtransaction where senderAccountNumber = '{accountNumber}' or receiverAccountNumber = '{accountNumber}'";
+            var cmdGetListTransaction = new MySqlCommand(strGetListTransaction, cnn);
+            var reader = cmdGetListTransaction.ExecuteReader();
+            while (reader.Read())
+            {
+                listTransaction.Add(new Transaction()
+                {
+                    TransactionCode = reader.GetString("transactionCode"),
+                    SenderAccountNumber = reader.GetString("senderAccountNumber"),
+                    ReceiverAccountNumber = reader.GetString("receiverAccountNumber"),
+                    Type = (TransactionType) reader.GetInt32("type"),
+                    Amount = reader.GetDouble("amount"),
+                    Fee = reader.GetDouble("fee"),
+                    Message = reader.GetString("message"),
+                    CreatedAt = reader.GetDateTime("createdAt"),
+                    UpdatedAt = reader.GetDateTime("updateAt"),
+                    Status = (TransactionStatus) reader.GetInt32("status")
+                });
+            }
+            cnn.Close();
+            return listTransaction;
+        }
+
+        public List<Transaction> GetAllTransactionHistory()
+        {
+            var listTransaction = new List<Transaction>();
+            var cnn = ConnectionHelper.GetConnection();
+            cnn.Open();
+            try
+            {
+                var strGetListTransaction = "select * from shbtransaction";
+                var cmdGetListTransaction = new MySqlCommand(strGetListTransaction, cnn);
+                var reader = cmdGetListTransaction.ExecuteReader();
+                while (reader.Read())
+                {
+                    listTransaction.Add(new Transaction()
+                    {
+                        TransactionCode = reader.GetString("transactionCode"),
+                        SenderAccountNumber = reader.GetString("senderAccountNumber"),
+                        ReceiverAccountNumber = reader.GetString("receiverAccountNumber"),
+                        Type = (TransactionType) reader.GetInt32("type"),
+                        Amount = reader.GetDouble("amount"),
+                        Fee = reader.GetDouble("fee"),
+                        Message = reader.GetString("message"),
+                        CreatedAt = reader.GetDateTime("createdAt"),
+                        UpdatedAt = reader.GetDateTime("updateAt"),
+                        Status = (TransactionStatus) reader.GetInt32("status")
+                    });
+                }
+
+                return listTransaction;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+            finally
+            {
+                cnn.Close();
+            }
+        }
+        
+        public void TransactionPage(List<Transaction> list)
+        {
+            var i = 0;
+            while (true)
+            {
+                Console.Clear();
+                var j = i + 1;
+                int sum = list.Count % 5 > 0 ? ((list.Count / 5) + 1) : list.Count;
+                Console.WriteLine("Lịch sử giao dịch:");
+                Console.WriteLine(
+                    "TransactionCode | SenderAccountNumber | ReceiverAccountNumber | Message | Amount | Fee | Type | Status | UpdatedAt");
+                var s = "";
+                foreach (var acc in list.GetRange(i * 5, (j == sum) ? (list.Count % 5) : 5))
+                {
+                    Console.WriteLine(acc.ToString());
+                }
+
+                if (sum == 1)
+                {
+                    break;
+                }
+
+                Console.WriteLine($"Trang {j}/{sum}");
+                Console.WriteLine("Nhập '< >' để chuyển trang, 'Backspace' Để quay lại!!!");
+                string key = Console.ReadKey().Key.ToString();
+                switch (key)
+                {
+                    case "LeftArrow":
+                        if (i == 0)
+                        {
+                            i = sum - 1;
+                        }
+                        else
+                        {
+                            i--;
+                        }
+
+                        break;
+                    case "RightArrow":
+                        if (i == sum - 1)
+                        {
+                            i = 0;
+                        }
+                        else
+                        {
+                            i++;
+                        }
+
+                        break;
+                    case "Backspace":
+                        break;
+                }
+
+                if (key.Equals("Backspace"))
+                {
+                    Console.WriteLine("Enter để xác nhận!!!");
+                    break;
+                }
+            }
         }
     }
 }

@@ -88,6 +88,11 @@ namespace shb_bank.Entity
         private string _fullName;
         public AccountRole Role { get; set; }
         public AccountStatus Status { get; set; }
+
+        public override string ToString()
+        {
+            return $"Account Number: {AccountNumber} |Balance: {Balance} |Username: {_username} |PasswordHash: {PasswordHash} |Salt: {Salt} |Role: {Role} |Fullname: {_fullName} |Phone: {_phone} |Email: {_email} |Status: {Status}";
+        }
     }
     public enum AccountRole
     {

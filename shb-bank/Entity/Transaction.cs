@@ -50,6 +50,11 @@ namespace shb_bank.Entity
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public TransactionStatus Status { get; set; }
+
+        public override string ToString()
+        {
+            return $"{TransactionCode} | {SenderAccountNumber} | {ReceiverAccountNumber} | {Message} | {_amount} | {Fee} | {Type} | {CreatedAt} | {UpdatedAt} | {Status}";
+        }
     }
     
     public enum TransactionType

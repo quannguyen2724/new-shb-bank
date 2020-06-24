@@ -89,6 +89,7 @@ namespace shb_bank.Controller
             {
                 Console.WriteLine("Không có tài khoản nào");
             }
+            _accountModel.AccountPage(listUser);
         }
 
         public void BalanceQty()
@@ -141,7 +142,7 @@ namespace shb_bank.Controller
             acc.Username = Console.ReadLine();
             _accountModel.GetList("username", acc.Username);
         }
-        
+
         public void FindUserByAccountNumber()
         {
             var acc = new Account();
@@ -149,13 +150,13 @@ namespace shb_bank.Controller
             acc.AccountNumber = Console.ReadLine();
             _accountModel.GetList("accountNumber", acc.AccountNumber);
         }
-        
+
         public void FindUserByPhone()
         {
             var acc = new Account();
             Console.WriteLine("Nhập số điện thoại: ");
             acc.Phone = Console.ReadLine();
-            _accountModel.GetList("phone",  acc.Phone);
+            _accountModel.GetList("phone", acc.Phone);
         }
     }
 }

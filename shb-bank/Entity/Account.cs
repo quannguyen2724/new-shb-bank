@@ -91,7 +91,7 @@ namespace shb_bank.Entity
 
         public override string ToString()
         {
-            return $"{AccountNumber} | {Balance} | {_username} | {PasswordHash} | {Salt} | {Role} | {_fullName} | {_phone} | {_email} | {Status}";
+            return $"Account Number: {AccountNumber} |Balance: {Balance} |Username: {_username} |PasswordHash: {PasswordHash} |Salt: {Salt} |Role: {Role} |Fullname: {_fullName} |Phone: {_phone} |Email: {_email} |Status: {Status}";
         }
     }
     public enum AccountRole

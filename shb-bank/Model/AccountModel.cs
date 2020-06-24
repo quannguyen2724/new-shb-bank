@@ -214,5 +214,62 @@ namespace shb_bank.Model
                 cnn.Close();
             }
         }
+
+        public void AccountPage(List<Account> listUser)
+        {
+            var i = 0;
+            while (true)
+            {
+                Console.Clear();
+                var j = i + 1;
+                int sum = listUser.Count % 5 > 0 ? ((listUser.Count / 5) + 1) : listUser.Count;
+                var s = "";
+                foreach (var acc in listUser.GetRange(i * 5, (j == sum) ? (listUser.Count % 5) : 5))
+                {
+                    Console.WriteLine(acc.ToString());
+                }
+
+                if (sum == 1)
+                {
+                    break;
+                }
+
+                Console.WriteLine($"Trang {j}/{sum}");
+                Console.WriteLine("Nhập '< >' để chuyển trang, 'Backspace' Để quay lại!!!");
+                string key = Console.ReadKey().Key.ToString();
+                switch (key)
+                {
+                    case "LeftArrow":
+                        if (i == 0)
+                        {
+                            i = sum - 1;
+                        }
+                        else
+                        {
+                            i--;
+                        }
+
+                        break;
+                    case "RightArrow":
+                        if (i == sum - 1)
+                        {
+                            i = 0;
+                        }
+                        else
+                        {
+                            i++;
+                        }
+
+                        break;
+                    case "Backspace":
+                        break;
+                }
+                if (key.Equals("Backspace"))
+                {
+                    Console.WriteLine("Enter để xác nhận!!!");
+                    break;
+                }
+            }
+        }
     }
 }
